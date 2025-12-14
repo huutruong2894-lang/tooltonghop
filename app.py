@@ -31,7 +31,10 @@ def _env(name: str, default: str = "") -> str:
 DATABASE_URL = _env("DATABASE_URL", "sqlite:///license.db")
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+if DATABASE_URL.startswith("postgresql://") and "+psycopg" not in DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
 
+engine = create_engine(DATABASE_URL, pool_pre_ping=True, ...)
 ADMIN_USER = _env("ADMIN_USER", "admin")
 ADMIN_PASS = _env("ADMIN_PASS", "admin")
 KEY_HASH_SECRET = _env("KEY_HASH_SECRET", "change-me-please")
