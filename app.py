@@ -34,7 +34,11 @@ if DATABASE_URL.startswith("postgres://"):
 if DATABASE_URL.startswith("postgresql://") and "+psycopg" not in DATABASE_URL:
     DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
 
-engine = create_engine(DATABASE_URL, pool_pre_ping=True, ...)
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+    connect_args=_connect_args_for_postgres(DATABASE_URL),
+)
 ADMIN_USER = _env("ADMIN_USER", "admin")
 ADMIN_PASS = _env("ADMIN_PASS", "admin")
 KEY_HASH_SECRET = _env("KEY_HASH_SECRET", "change-me-please")
