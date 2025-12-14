@@ -1,2 +1,8 @@
-PyQt5==5.15.11
+fastapi==0.115.2
+uvicorn[standard]==0.30.6
+SQLAlchemy==2.0.36
+psycopg2-binary==2.9.9
+cryptography==43.0.3
+itsdangerous==2.2.0
+python-multipart==0.0.12
 requests==2.32.3
