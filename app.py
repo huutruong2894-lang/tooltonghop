@@ -95,8 +95,9 @@ class Activation(Base):
 
 
 def _connect_args_for_postgres(url: str) -> dict:
-    # Neon/Render: keep connect timeouts tight to avoid startup hanging forever
-    if url.startswith("postgresql://") or url.startswith("postgresql+psycopg2://"):
+    # SQLAlchemy connect_args are passed to DBAPI connect()
+    # For Postgres (Neon), set a connect_timeout to avoid hanging on cold start.
+    if url.startswith("postgresql://") or url.startswith("postgresql+psycopg://"):
         return {"connect_timeout": 10}
     return {}
 
