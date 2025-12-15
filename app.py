@@ -696,3 +696,12 @@ def admin_revoke_activation(activation_id: str, _tok=Depends(admin_auth), sess=D
     act.revoked_at = _now()
     sess.commit()
     return {"ok": True}
+
+@app.delete("/v1/admin/activations/{activation_id}")
+def admin_delete_activation(activation_id: str, _tok=Depends(admin_auth), sess=Depends(db_sess)):
+    act = sess.execute(select(Activation).where(Activation.id == activation_id)).scalar_one_or_none()
+    if not act:
+        return {"ok": True}  # idempotent
+    sess.delete(act)
+    sess.commit()
+    return {"ok": True}
