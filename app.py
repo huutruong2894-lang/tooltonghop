@@ -42,7 +42,8 @@ KEY_HASH_SECRET = _env("KEY_HASH_SECRET", "change-me-please")
 LICENSE_KID = _env("LICENSE_KID", "k1")
 LICENSE_SIGNING_PRIVATE_PEM_B64 = _env("LICENSE_SIGNING_PRIVATE_PEM_B64", "")
 
-OFFLINE_GRACE_DAYS = int(_env("OFFLINE_GRACE_DAYS", "7"))
+OFFLINE_GRACE_DAYS = int(_env("OFFLINE_GRACE_DAYS", "0"))
+CERT_TTL_SECONDS = int(_env("CERT_TTL_SECONDS", "300"))
 ADMIN_TOKEN_TTL_SECONDS = int(_env("ADMIN_TOKEN_TTL_SECONDS", str(12 * 3600)))  # 12h
 
 LICENSE_PREFIX = _env("LICENSE_PREFIX", "LIC")
@@ -313,14 +314,23 @@ def public_keys():
 
 
 def _license_payload(lic: License, act: Activation) -> Dict[str, Any]:
+    now = _now()
+    cert_exp = min(lic.expires_at, now + timedelta(seconds=CERT_TTL_SECONDS))
+
     return {
         "iss": "tooltonghop-license",
         "kid": LICENSE_KID,
         "license_id": lic.id,
         "activation_id": act.id,
         "machine_id": act.machine_id,
-        "iat": int(_now().timestamp()),
-        "exp": int(lic.expires_at.timestamp()),
+
+        # cert ngắn hạn để buộc refresh
+        "iat": int(now.timestamp()),
+        "exp": int(cert_exp.timestamp()),
+
+        # license thật sự vẫn tới ngày hết hạn
+        "lic_exp": int(lic.expires_at.timestamp()),
+
         "offline_grace_days": OFFLINE_GRACE_DAYS,
     }
 
